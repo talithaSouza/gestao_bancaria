@@ -1,0 +1,14 @@
+services:
+    db:
+        image: mysql:8.0
+        container_name: mysql_desafio_container
+        restart: always
+        env_file:
+            - ./config/.env
+        ports:
+            - "3306:3306"
+        volumes: 
+        - db_data:/var/lib/mysql
+
+volumes: 
+    db_data: {}
