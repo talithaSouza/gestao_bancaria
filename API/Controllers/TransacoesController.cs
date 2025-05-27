@@ -25,22 +25,17 @@ namespace API.Controllers
         {
             try
             {
-                Conta contaSaldoAtualizado;
-
-                switch (tipoTransacao)
-                {
-                    case TipoTransacao.P:
-                        contaSaldoAtualizado = await _service.Pix(conta.NumeroConta, conta.Saldo);
-                        break;
-                    default:
-                        return BadRequest($"Opção de transação {tipoTransacao} inválida");
-                }
+                Conta contaSaldoAtualizado = await _service.ExecutarSaquesAsync(tipoTransacao,conta.NumeroConta, conta.Saldo);
 
                 return Ok(contaSaldoAtualizado);
             }
             catch (SaldoInsificienteException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

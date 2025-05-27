@@ -1,7 +1,9 @@
 using Domain.Entidades;
+using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces.Repository;
 using Domain.Interfaces.Service;
+using Service.Patterns.Strategies.Transacao;
 
 namespace Services
 {
@@ -9,6 +11,7 @@ namespace Services
     {
         private readonly ITransacaoRepository _repository;
         private readonly IContaRepository _contaRepository;
+        private readonly ITransacaoStrategy transacaoStrategy;
 
         public TransacaoService(ITransacaoRepository repository, IContaRepository contaRepository)
         {
@@ -16,11 +19,33 @@ namespace Services
             _contaRepository = contaRepository;
 
         }
-        public async Task<Conta> Pix(int numeroConta, decimal saldoRetirado)
+
+        private ITransacaoStrategy SetStategy(TipoTransacao tipoTransacao)
+        {
+            switch (tipoTransacao)
+            {
+                case TipoTransacao.P:
+                    return new PixStrategy();
+
+                case TipoTransacao.C:
+                    return new CreditoStrategy();
+
+                case TipoTransacao.D:
+                    return new DebitoStrategy();
+
+                default:
+                    throw new InvalidOperationException($"Opção de transação {tipoTransacao} inválida");
+            }
+
+        }
+        
+        public async Task<Conta> ExecutarSaquesAsync(TipoTransacao tipoTransacao, int numeroConta, decimal saldoRetirado)
         {
             Conta conta = await _contaRepository.Retornar(numeroConta) ?? throw new NotFoundException($"Não foi encontrado conta com o numero {numeroConta}");
 
-            conta.RealizarSaque(saldoRetirado);
+            var transacaoStrategy = SetStategy(tipoTransacao);
+
+            Conta contaAtualizada = transacaoStrategy.Saque(conta, saldoRetirado);
 
             return await _repository.AtualizarSaldoAsync(conta);
         }

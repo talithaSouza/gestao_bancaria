@@ -1,9 +1,10 @@
 using Domain.Entidades;
+using Domain.Enums;
 
 namespace Domain.Interfaces.Service
 {
     public interface ITransacaoService
     {
-        Task<Conta> Pix(int numeroConta, decimal saldoRetirado);
+        Task<Conta> ExecutarSaquesAsync(TipoTransacao tipoTransacao, int numeroConta, decimal saldoRetirado);
     }
 }
