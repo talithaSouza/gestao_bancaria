@@ -49,7 +49,7 @@ using (var scope = app.Services.CreateScope())
     {
         // Tenta abrir conexão com o banco
         await context.Database.OpenConnectionAsync();
-        Console.WriteLine("Conexão com o banco MySQL OK entrou caralho!");
+        Console.WriteLine("Conexão com o banco MySQL");
         await context.Database.CloseConnectionAsync();
     }
     catch (Exception ex)
