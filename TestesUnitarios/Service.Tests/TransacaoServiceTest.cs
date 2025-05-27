@@ -3,7 +3,6 @@ using Domain.Interfaces.Repository;
 using Domain.Interfaces.Service;
 using Moq;
 using Services;
-using Sprache;
 
 namespace TestesUnitarios.Service.Tests
 {
@@ -11,6 +10,7 @@ namespace TestesUnitarios.Service.Tests
     {
         private readonly Mock<IContaRepository> _contaRepositoryMock;
         private readonly Mock<ITransacaoRepository> _repositoryMock;
+        private readonly Mock<IMovimentacaoService> _movimentacaoServiceMock;
 
         private readonly ITransacaoService _service;
 
@@ -18,8 +18,9 @@ namespace TestesUnitarios.Service.Tests
         {
             _contaRepositoryMock = new Mock<IContaRepository>();
             _repositoryMock = new Mock<ITransacaoRepository>();
+            _movimentacaoServiceMock = new Mock<IMovimentacaoService>();
 
-            _service = new TransacaoService(_repositoryMock.Object, _contaRepositoryMock.Object);
+            _service = new TransacaoService(_repositoryMock.Object, _contaRepositoryMock.Object, _movimentacaoServiceMock.Object);
         }
 
         [Fact(DisplayName = "ExecutarSaquesAsync para o tipo PIX")]

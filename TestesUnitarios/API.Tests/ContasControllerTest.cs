@@ -1,6 +1,8 @@
 using System.Net;
 using System.Threading.Tasks;
 using API.Controllers;
+using API.DTO;
+using AutoMapper;
 using Domain.Entidades;
 using Domain.Exceptions;
 using Domain.Interfaces.Service;
@@ -9,21 +11,25 @@ using Moq;
 
 namespace TestesUnitarios.API.Tests
 {
-    public class ContasControllerTest
+    public class ContasControllerTest : BaseMapperTest
     {
         private readonly Mock<IContaService> _serviceMock;
         private ContasController _controller;
         private Mock<IUrlHelper> _urlHelperMock;
+        private IMapper _mapper;
 
         public ContasControllerTest()
         {
             _serviceMock = new Mock<IContaService>();
             _urlHelperMock = new Mock<IUrlHelper>();
 
-            _controller = new ContasController(_serviceMock.Object);
+            _mapper = Mapper;
+
+            _controller = new ContasController(_serviceMock.Object, _mapper);
 
             _urlHelperMock.Setup(x => x.Link(It.IsAny<string>(), It.IsAny<object>()))
                           .Returns("http://localhost/api/contas/");
+
 
             _controller.Url = _urlHelperMock.Object;
         }
@@ -32,11 +38,15 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Criando conta com sucesso")]
         public async Task CriandoConta_Status201()
         {
-            var novaConta = new Conta(Faker.RandomNumber.Next(100, 200), 100);
+            var novaContaDTO = new ContaDTO
+            {
+                NumeroConta = Faker.RandomNumber.Next(100, 200),
+                Saldo = 100
+            };
 
-            _serviceMock.Setup(m => m.CriarAsync(novaConta)).ReturnsAsync(novaConta);
+            _serviceMock.Setup(m => m.CriarAsync(It.IsAny<Conta>())).ReturnsAsync((Conta contaSalva) => contaSalva);
 
-            var result = await _controller.Criar(novaConta);
+            var result = await _controller.Criar(novaContaDTO);
 
             var resultType = Assert.IsType<CreatedResult>(result);
         }
@@ -44,12 +54,16 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Criando conta - Conflito")]
         public async Task CriandoConta_Conflito409()
         {
-            var novaConta = new Conta(Faker.RandomNumber.Next(100, 200), 100);
+            var novaContaDTO = new ContaDTO
+            {
+                NumeroConta = Faker.RandomNumber.Next(100, 200),
+                Saldo = 100
+            };
 
-            _serviceMock.Setup(m => m.CriarAsync(novaConta))
+            _serviceMock.Setup(m => m.CriarAsync(It.IsAny<Conta>()))
                         .ThrowsAsync(new ConflitoContaException("conta já existe"));
 
-            var result = await _controller.Criar(novaConta);
+            var result = await _controller.Criar(novaContaDTO);
 
             var resultType = Assert.IsType<ObjectResult>(result);
 
@@ -59,12 +73,16 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Criando contas - BadRequest")]
         public async Task CriandoConta_400_DomainException()
         {
-            var novaConta = new Conta(Faker.RandomNumber.Next(100, 200), 100);
+            var novaContaDTO = new ContaDTO
+            {
+                NumeroConta = Faker.RandomNumber.Next(100, 200),
+                Saldo = 100
+            };
 
-            _serviceMock.Setup(m => m.CriarAsync(novaConta))
+            _serviceMock.Setup(m => m.CriarAsync(It.IsAny<Conta>()))
                         .ThrowsAsync(new DomainException("Erro de preenchimento"));
 
-            var result = await _controller.Criar(novaConta);
+            var result = await _controller.Criar(novaContaDTO);
 
             var resultType = Assert.IsType<BadRequestObjectResult>(result);
         }
@@ -72,12 +90,16 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Criando contas - InternalServerErro")]
         public async Task CriandoConta_500_ExceptionGenerica()
         {
-            var novaConta = new Conta(Faker.RandomNumber.Next(100, 200), 100);
+            var novaContaDTO = new ContaDTO
+            {
+                NumeroConta = Faker.RandomNumber.Next(100, 200),
+                Saldo = 100
+            };
 
-            _serviceMock.Setup(m => m.CriarAsync(novaConta))
+            _serviceMock.Setup(m => m.CriarAsync(It.IsAny<Conta>()))
                         .ThrowsAsync(new Exception("Erro interno"));
 
-            var result = await _controller.Criar(novaConta);
+            var result = await _controller.Criar(novaContaDTO);
 
             var resultType = Assert.IsType<ObjectResult>(result);
 
