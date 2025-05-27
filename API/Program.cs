@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using API.Setup;
 using Infra.Context;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +26,16 @@ var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+       .AddJsonOptions(opts =>
+       {
+           opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; 
+           opts.JsonSerializerOptions.WriteIndented = true;
+       });
 
 builder.Services.RegisterService();
 builder.Services.RegisterRepository();
+builder.Services.RegisterAutoMapper();
 
 #endregion
 

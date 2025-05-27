@@ -7,6 +7,9 @@ namespace Domain.Entidades
         public int NumeroConta { get; private set; }
         public decimal Saldo { get; private set; }
 
+        //Propriedade Navegação
+        public IEnumerable<Movimentacao>? Movimentacoes { get; set; }
+
         public Conta(int numeroConta, decimal saldo)
         {
             NumeroConta = numeroConta;
