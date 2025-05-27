@@ -31,7 +31,6 @@ namespace API.Controllers
         /// <response code="201">Transação realizada com sucesso</response>
         /// <response code="404">Conta não encontrada ou saldo insuficiente</response>
         /// <response code="500">Erro interno do servidor</response>
-
         [HttpPost]
         public async Task<IActionResult> RealizarTransacao([FromQuery(Name = "Tipo"), Required] TipoTransacao tipoTransacao, [FromBody] Conta conta)
         {
