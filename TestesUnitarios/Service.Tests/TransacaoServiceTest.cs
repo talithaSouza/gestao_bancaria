@@ -26,6 +26,7 @@ namespace TestesUnitarios.Service.Tests
         [Fact(DisplayName = "ExecutarSaquesAsync para o tipo PIX")]
         public async Task ExecutarSaquesAsync_TipoPIX()
         {
+            var tipoTransacao = Domain.Enums.TipoTransacao.P;
             Conta contaSalva = new(Faker.RandomNumber.Next(100, 200), 100);
 
             int numeroConta = contaSalva.NumeroConta;
@@ -37,16 +38,23 @@ namespace TestesUnitarios.Service.Tests
 
             _repositoryMock.Setup(m => m.AtualizarSaldoAsync(It.IsAny<Conta>())).ReturnsAsync((Conta contaSaldoAlterado) => contaSaldoAlterado);
 
-            var result = await _service.ExecutarSaquesAsync(Domain.Enums.TipoTransacao.P, numeroConta, valorRetirado);
+            _movimentacaoServiceMock
+            .Setup(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(), tipoTransacao))
+            .Returns(Task.CompletedTask);
+
+            var result = await _service.ExecutarSaquesAsync(tipoTransacao, numeroConta, valorRetirado);
+
+            _movimentacaoServiceMock.Verify(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(), tipoTransacao), Times.Once);
 
             Assert.NotNull(result);
             Assert.Equal(numeroConta, result.NumeroConta);
             Assert.Equal(saldoRestante, result.Saldo);
         }
-        
+
         [Fact(DisplayName = "ExecutarSaquesAsync para o tipo DEBITO")]
         public async Task ExecutarSaquesAsync_TipoDEBITO()
         {
+            var tipoTransacao = Domain.Enums.TipoTransacao.D;
             Conta contaSalva = new(Faker.RandomNumber.Next(100, 200), 100);
 
             int numeroConta = contaSalva.NumeroConta;
@@ -59,16 +67,23 @@ namespace TestesUnitarios.Service.Tests
 
             _repositoryMock.Setup(m => m.AtualizarSaldoAsync(It.IsAny<Conta>())).ReturnsAsync((Conta contaSaldoAlterado) => contaSaldoAlterado);
 
-            var result = await _service.ExecutarSaquesAsync(Domain.Enums.TipoTransacao.D, numeroConta, valorRetirado);
+            _movimentacaoServiceMock
+            .Setup(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(), tipoTransacao))
+            .Returns(Task.CompletedTask);
+
+            var result = await _service.ExecutarSaquesAsync(tipoTransacao, numeroConta, valorRetirado);
+
+            _movimentacaoServiceMock.Verify(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(), tipoTransacao), Times.Once);
 
             Assert.NotNull(result);
             Assert.Equal(numeroConta, result.NumeroConta);
             Assert.Equal(saldoRestante, result.Saldo);
         }
-        
+
         [Fact(DisplayName = "ExecutarSaquesAsync para o tipo CREDITO")]
         public async Task ExecutarSaquesAsync_TipoCREDITO()
         {
+            var tipoTransacao = Domain.Enums.TipoTransacao.C;
             Conta contaSalva = new(Faker.RandomNumber.Next(100, 200), 100);
 
             int numeroConta = contaSalva.NumeroConta;
@@ -81,12 +96,18 @@ namespace TestesUnitarios.Service.Tests
 
             _repositoryMock.Setup(m => m.AtualizarSaldoAsync(It.IsAny<Conta>())).ReturnsAsync((Conta contaSaldoAlterado) => contaSaldoAlterado);
 
-            var result = await _service.ExecutarSaquesAsync(Domain.Enums.TipoTransacao.C, numeroConta, valorRetirado);
+            _movimentacaoServiceMock
+            .Setup(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(),tipoTransacao))
+            .Returns(Task.CompletedTask);
+
+            var result = await _service.ExecutarSaquesAsync(tipoTransacao, numeroConta, valorRetirado);
+
+            _movimentacaoServiceMock.Verify(m => m.RegistrarAsync(numeroConta, It.IsAny<decimal>(), It.IsAny<decimal>(),tipoTransacao), Times.Once);
 
             Assert.NotNull(result);
             Assert.Equal(numeroConta, result.NumeroConta);
             Assert.Equal(saldoRestante, result.Saldo);
         }
-        
+
     }
 }
