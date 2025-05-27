@@ -1,3 +1,4 @@
+using System.Transactions;
 using Domain.Entidades;
 using Domain.Enums;
 using Domain.Exceptions;
@@ -11,12 +12,13 @@ namespace Services
     {
         private readonly ITransacaoRepository _repository;
         private readonly IContaRepository _contaRepository;
+        private readonly IMovimentacaoService _movimentacaoService;
 
-        public TransacaoService(ITransacaoRepository repository, IContaRepository contaRepository)
+        public TransacaoService(ITransacaoRepository repository, IContaRepository contaRepository, IMovimentacaoService movimentacaoService)
         {
             _repository = repository;
             _contaRepository = contaRepository;
-
+            _movimentacaoService = movimentacaoService;
         }
 
         private static ITransacaoStrategy SetStategy(TipoTransacao tipoTransacao)
@@ -40,13 +42,24 @@ namespace Services
         
         public async Task<Conta> ExecutarSaquesAsync(TipoTransacao tipoTransacao, int numeroConta, decimal saldoRetirado)
         {
+            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
             Conta conta = await _contaRepository.Retornar(numeroConta) ?? throw new NotFoundException($"Não foi encontrado conta com o numero {numeroConta}");
 
-            var transacaoStrategy = SetStategy(tipoTransacao);
+            decimal saldoAnterior = conta.Saldo;
 
+            var transacaoStrategy = SetStategy(tipoTransacao);
+           
             Conta contaAtualizada = transacaoStrategy.Saque(conta, saldoRetirado);
 
-            return await _repository.AtualizarSaldoAsync(contaAtualizada);
+            _ = await _repository.AtualizarSaldoAsync(contaAtualizada);
+
+            await _movimentacaoService.RegistrarAsync(conta.NumeroConta, saldoAnterior, conta.Saldo, tipoTransacao);
+
+
+            transaction.Complete();
+
+            return contaAtualizada;
         }
 
     }
