@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
+using API.DTO;
+using AutoMapper;
 using Domain.Entidades;
 using Domain.Exceptions;
 using Domain.Interfaces.Service;
@@ -13,20 +15,24 @@ namespace API.Controllers
     public class ContasController : ControllerBase
     {
         private readonly IContaService _service;
+        private IMapper _mapper;
 
-        public ContasController(IContaService service)
+        public ContasController(IContaService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar([FromBody] Conta novaConta)
+        public async Task<IActionResult> Criar([FromBody] ContaDTO novaContaDTO)
         {
             try
             {
-                var contaCriada = await _service.CriarAsync(novaConta);
+                var novaContaEntity = _mapper.Map<Conta>(novaContaDTO);
 
-                return Created(new Uri(Url.Link("RetornarContaPorNumero", new { numero_conta = contaCriada.NumeroConta })), contaCriada);
+                var contaCriada = await _service.CriarAsync(novaContaEntity);
+
+                return Created(new Uri(Url.Link("RetornarContaPorNumero", new { numero_conta = contaCriada.NumeroConta })), _mapper.Map<ContaDTO>(contaCriada));
             }
             catch (DomainException ex)
             {
@@ -49,7 +55,7 @@ namespace API.Controllers
             {
                 Conta contaEncontrada = await _service.RetornarAsync(numeroConta);
 
-                return Ok(contaEncontrada);
+                return Ok(_mapper.Map<ContaDTO>(contaEncontrada));
             }
             catch (NotFoundException ex)
             {
