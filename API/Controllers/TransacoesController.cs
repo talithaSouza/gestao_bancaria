@@ -20,6 +20,18 @@ namespace API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// <para>Realiza transações de saldo de acordo com o tipo.</para>
+        /// <para>Transações do tipo Débito adicionam 3% de juros sobre a operação.</para>
+        /// <para>Transações do tipo Crédito adicionam 5% de juros sobre a operação.</para>
+        /// </summary>
+        /// <param name="tipoTransacao">P: PIX; D: Débito; C: Credito</param>
+        /// <param name="conta">Dados da conta com numero da conta e o valor que irá retirar</param>
+        /// <returns>Dados da conta com saldo atualiado</returns>
+        /// <response code="201">Transação realizada com sucesso</response>
+        /// <response code="404">Conta não encontrada ou saldo insuficiente</response>
+        /// <response code="500">Erro interno do servidor</response>
+
         [HttpPost]
         public async Task<IActionResult> RealizarTransacao([FromQuery(Name = "Tipo"), Required] TipoTransacao tipoTransacao, [FromBody] Conta conta)
         {
