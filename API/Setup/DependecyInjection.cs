@@ -14,6 +14,10 @@ namespace API.Setup
             services.AddScoped<IContaService, ContaService>();
             #endregion
 
+            #region M
+            services.AddScoped<IMovimentacaoService, MovimentacaoService>();
+            #endregion
+
             #region T
             services.AddScoped<ITransacaoService, TransacaoService>();
             #endregion
@@ -29,6 +33,10 @@ namespace API.Setup
 
             #region C
             services.AddScoped<IContaRepository, ContaRepository>();
+            #endregion
+           
+            #region M
+            services.AddScoped<IMovimentacaoRepository, MovimentacaoRepository>();
             #endregion
 
             #region T
