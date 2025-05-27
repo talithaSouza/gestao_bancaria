@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using Domain.Entidades;
+using Domain.Exceptions;
 using Domain.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +20,24 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] Conta novaConta)
         {
-            System.Console.WriteLine("entrou na controller");
             var contaCriada = await _service.CriarAsync(novaConta);
 
             return Ok(contaCriada);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RetornarConta([FromQuery(Name = "numero_conta"), Required] int numeroConta)
+        {
+            try
+            {
+                Conta contaEncontrada = await _service.RetornarAsync(numeroConta);
+
+                return Ok(contaEncontrada);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

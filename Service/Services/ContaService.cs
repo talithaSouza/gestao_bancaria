@@ -18,10 +18,20 @@ namespace Service.Services
         {
             var contaCadastrada = await _repository.Retornar(novaConta.NumeroConta);
 
-            if(contaCadastrada != null)
+            if (contaCadastrada != null)
                 throw new ConflitoContaException($"Já existe uma conta cadastrada com a numeração {novaConta.NumeroConta}");
 
             return await _repository.Criar(novaConta);
+        }
+        
+        public async Task<Conta> RetornarAsync(int numeroConta)
+        {
+            Conta conta = await _repository.Retornar(numeroConta);
+
+            if(conta == null)
+                throw new NotFoundException($"Não foi encontrada uma conta com o número {numeroConta}");
+
+            return conta;
         }
 
     }
