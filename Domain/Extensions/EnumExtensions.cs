@@ -23,5 +23,26 @@ namespace Domain.Extensions
 
             return description;
         }
+
+        public static TEnum GetEnumFromDescription<TEnum>(this string description)
+        {
+            var enumType = typeof(TEnum);
+            if (!enumType.IsEnum)
+            {
+                throw new ArgumentException("O tipo fornecedio não é um Enum");
+            }
+
+            var enumValues = Enum.GetValues(enumType).Cast<TEnum>();
+            foreach (var value in enumValues)
+            {
+                var fieldInfo = value.GetType().GetField(value.ToString());
+                var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute));
+                if (attribute != null && attribute.Description.Equals(description, StringComparison.OrdinalIgnoreCase))
+                {
+                    return value;
+                }
+            }
+            throw new ArgumentException($"Valor Enum não encontrado para descrição'{description}'.");
+        }
     }
 }
