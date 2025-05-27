@@ -1,25 +1,32 @@
 using API.Controllers;
+using API.DTO;
+using AutoMapper;
 using Domain.Entidades;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Xunit.Sdk;
 
 namespace TestesUnitarios.API.Tests
 {
-    public class TransacoesControllerTest
+    public class TransacoesControllerTest: BaseMapperTest
     {
         private readonly Mock<ITransacaoService> _serviceMock;
         private TransacoesController _controller;
         private Mock<IUrlHelper> _urlHelperMock;
+        private readonly IMapper _mapper;
 
+        private readonly Mock<IMovimentacaoService> _movimentacaoServiceMock;
         public TransacoesControllerTest()
         {
             _serviceMock = new Mock<ITransacaoService>();
             _urlHelperMock = new Mock<IUrlHelper>();
+            _mapper = Mapper;
+            _movimentacaoServiceMock = new Mock<IMovimentacaoService>();
 
-            _controller = new TransacoesController(_serviceMock.Object);
+            _controller = new TransacoesController(_serviceMock.Object, _movimentacaoServiceMock.Object, _mapper);
 
             _urlHelperMock.Setup(x => x.Link(It.IsAny<string>(), It.IsAny<object>()))
                           .Returns("http://localhost/api/transacoes/");
@@ -33,20 +40,29 @@ namespace TestesUnitarios.API.Tests
         [InlineData(TipoTransacao.P)]
         public async Task Transacoes_Status201(TipoTransacao tipoTransacao)
         {
-            var contaAlterada = new Conta(Faker.RandomNumber.Next(100, 200), 10);
+            var contaAlterada = new ContaDTO()
+            {
+                NumeroConta =  Faker.RandomNumber.Next(100, 200),
+                Saldo =  10
+            };
 
             _serviceMock.Setup(m => m.ExecutarSaquesAsync(tipoTransacao, contaAlterada.NumeroConta, contaAlterada.Saldo))
-                        .ReturnsAsync(contaAlterada);
+                        .ReturnsAsync(new Conta(contaAlterada.NumeroConta, contaAlterada.Saldo));
 
             var result = await _controller.RealizarTransacao(tipoTransacao, contaAlterada);
 
-            var resultType = Assert.IsType<OkObjectResult>(result);
+            var resultType = Assert.IsType<CreatedResult>(result);
         }
 
         [Fact(DisplayName = "Realizando Transações - Saldo Insuficiente")]
         public async Task Transacoes_Status404_SaldoInsuficiente()
         {
-            var contaAlterada = new Conta(Faker.RandomNumber.Next(100, 200), 10);
+            var contaAlterada = new ContaDTO()
+            {
+                NumeroConta =  Faker.RandomNumber.Next(100, 200),
+                Saldo =  10
+            };
+
             TipoTransacao tipoTransacaoRandom = GetTipoTransacaoAleatoria();
 
             _serviceMock.Setup(m => m.ExecutarSaquesAsync(tipoTransacaoRandom, contaAlterada.NumeroConta, contaAlterada.Saldo))
@@ -60,7 +76,12 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Realizando Transações - Conta Não Encontrada")]
         public async Task Transacoes_Status404_ContaNaoEncontrada()
         {
-            var contaAlterada = new Conta(Faker.RandomNumber.Next(100, 200), 10);
+            var contaAlterada = new ContaDTO()
+            {
+                NumeroConta =  Faker.RandomNumber.Next(100, 200),
+                Saldo =  10
+            };
+
             TipoTransacao tipoTransacaoRandom = GetTipoTransacaoAleatoria();
 
             _serviceMock.Setup(m => m.ExecutarSaquesAsync(tipoTransacaoRandom, contaAlterada.NumeroConta, contaAlterada.Saldo))
@@ -74,7 +95,12 @@ namespace TestesUnitarios.API.Tests
         [Fact(DisplayName = "Realizando Transações - InvalidOperationException")]
         public async Task Transacoes_Status400_InvalidOperationException()
         {
-            var contaAlterada = new Conta(Faker.RandomNumber.Next(100, 200), 10);
+            var contaAlterada = new ContaDTO()
+            {
+                NumeroConta =  Faker.RandomNumber.Next(100, 200),
+                Saldo =  10
+            };
+            
             TipoTransacao tipoTransacaoRandom = GetTipoTransacaoAleatoria();
 
             _serviceMock.Setup(m => m.ExecutarSaquesAsync(tipoTransacaoRandom, contaAlterada.NumeroConta, contaAlterada.Saldo))
