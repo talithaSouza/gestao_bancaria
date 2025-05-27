@@ -1,3 +1,5 @@
+using System.Net;
+using System.Threading.Tasks;
 using API.Controllers;
 using API.DTO;
 using AutoMapper;
@@ -34,6 +36,7 @@ namespace TestesUnitarios.API.Tests
             _controller.Url = _urlHelperMock.Object;
         }
 
+        #region RealizarTransacao
         [Theory(DisplayName = "Realizando Transações com sucesso")]
         [InlineData(TipoTransacao.C)]
         [InlineData(TipoTransacao.D)]
@@ -110,6 +113,36 @@ namespace TestesUnitarios.API.Tests
 
             var resultType = Assert.IsType<BadRequestObjectResult>(result);
         }
+        #endregion
+
+        #region BuscarMovimentacoesDaConta
+        [Fact(DisplayName = "Controller Buscar Movimentacoes por conta")]
+        public async Task BuscarMovimentacaoPorContaComSucesso()
+        {
+            _movimentacaoServiceMock
+            .Setup(m => m.RetornarMovimentacoesPorConta(It.IsAny<int>()))
+            .ReturnsAsync(new List<Movimentacao>());
+
+            var result = await _controller.BuscarMovimentacoesDaConta(Faker.RandomNumber.Next());
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+
+
+        [Fact(DisplayName = "Controller Buscar Movimentacoes por conta Exception")]
+        public async Task BuscarMovimentacaoPorContaException()
+        {
+            _movimentacaoServiceMock
+            .Setup(m => m.RetornarMovimentacoesPorConta(It.IsAny<int>()))
+            .ThrowsAsync(new Exception());
+
+            var result = await _controller.BuscarMovimentacoesDaConta(Faker.RandomNumber.Next());
+
+            var resultStatus = Assert.IsType<ObjectResult>(result);
+
+            Assert.Equal((int)HttpStatusCode.InternalServerError, resultStatus.StatusCode);
+        }
+        #endregion
 
         private static TipoTransacao GetTipoTransacaoAleatoria()
         {
