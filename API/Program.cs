@@ -1,3 +1,4 @@
+using API.Setup;
 using Infra.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.RegisterService();
+builder.Services.RegisterRepository();
+
 #endregion
 
 var app = builder.Build();
@@ -33,6 +37,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 #endregion
 
 using (var scope = app.Services.CreateScope())
