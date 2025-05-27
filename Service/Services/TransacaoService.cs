@@ -47,7 +47,7 @@ namespace Services
 
             Conta contaAtualizada = transacaoStrategy.Saque(conta, saldoRetirado);
 
-            return await _repository.AtualizarSaldoAsync(conta);
+            return await _repository.AtualizarSaldoAsync(contaAtualizada);
         }
 
     }
