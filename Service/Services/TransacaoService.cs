@@ -11,7 +11,6 @@ namespace Services
     {
         private readonly ITransacaoRepository _repository;
         private readonly IContaRepository _contaRepository;
-        private readonly ITransacaoStrategy transacaoStrategy;
 
         public TransacaoService(ITransacaoRepository repository, IContaRepository contaRepository)
         {
@@ -20,7 +19,7 @@ namespace Services
 
         }
 
-        private ITransacaoStrategy SetStategy(TipoTransacao tipoTransacao)
+        private static ITransacaoStrategy SetStategy(TipoTransacao tipoTransacao)
         {
             switch (tipoTransacao)
             {
