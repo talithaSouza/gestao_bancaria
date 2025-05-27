@@ -4,10 +4,10 @@ namespace Domain.Entidades
 {
     public class Conta
     {
-        public int NumeroConta { get; set; }
-        public double Saldo { get; set; }
+        public int NumeroConta { get; private set; }
+        public decimal Saldo { get; private set; }
 
-        public Conta(int numeroConta, double saldo)
+        public Conta(int numeroConta, decimal saldo)
         {
             NumeroConta = numeroConta;
             Saldo = saldo;
@@ -26,6 +26,16 @@ namespace Domain.Entidades
             {
                 throw new DomainException("Saldo da conta não pode ser menos que zero");
             }
+        }
+
+        public void RealizarSaque(decimal saldoRetirado)
+        {
+            if (Saldo < saldoRetirado)
+            {
+                throw new SaldoInsificienteException("Não é possivel realizar essa transação, seu saldo é insuficiente");
+            }
+
+            Saldo -= saldoRetirado;
         }
     }
 

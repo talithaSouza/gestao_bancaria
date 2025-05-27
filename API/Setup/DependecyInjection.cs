@@ -2,6 +2,7 @@ using Domain.Interfaces.Repository;
 using Domain.Interfaces.Service;
 using Infra.Repositories;
 using Service.Services;
+using Services;
 
 namespace API.Setup
 {
@@ -13,6 +14,10 @@ namespace API.Setup
             services.AddScoped<IContaService, ContaService>();
             #endregion
 
+            #region T
+            services.AddScoped<ITransacaoService, TransacaoService>();
+            #endregion
+
             return services;
         }
 
@@ -21,10 +26,16 @@ namespace API.Setup
             #region B
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             #endregion
-            
+
             #region C
             services.AddScoped<IContaRepository, ContaRepository>();
             #endregion
+
+            #region T
+            services.AddScoped<ITransacaoRepository, TransacaoRepository>();
+            #endregion
+
+
             return services;
         }
     }
