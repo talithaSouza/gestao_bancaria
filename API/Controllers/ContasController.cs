@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Net.Http.Headers;
 using Domain.Entidades;
 using Domain.Exceptions;
 using Domain.Interfaces.Service;
@@ -20,12 +22,27 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] Conta novaConta)
         {
-            var contaCriada = await _service.CriarAsync(novaConta);
+            try
+            {
+                var contaCriada = await _service.CriarAsync(novaConta);
 
-            return Ok(contaCriada);
+                return Created(new Uri(Url.Link("RetornarContaPorNumero", new { numero_conta = contaCriada.NumeroConta })), contaCriada);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ConflitoContaException ex)
+            {
+                return StatusCode((int)HttpStatusCode.Conflict, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
-        [HttpGet]
+        [HttpGet(Name = "RetornarContaPorNumero")]
         public async Task<IActionResult> RetornarConta([FromQuery(Name = "numero_conta"), Required] int numeroConta)
         {
             try
@@ -37,6 +54,10 @@ namespace API.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }
