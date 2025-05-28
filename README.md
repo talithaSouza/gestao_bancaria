@@ -28,10 +28,12 @@ docker compose up -d
 ## Verifique se há dois container executando( o da aplicação e o banco) com o comando:
 docker ps
 
+```
 Exemplo de resposta:
 CONTAINER ID   IMAGE                         COMMAND                  CREATED         STATUS                  PORTS                               NAMES
 ae03de75d81c   obj_gestao_bancaria-backend   "dotnet API.dll"         7 seconds ago   Up Less than a second   0.0.0.0:5284->5284/tcp              obj_proj_container
 d163bae90847   mysql:8.0                     "docker-entrypoint.s…"   7 seconds ago   Up 6 seconds            0.0.0.0:3306->3306/tcp, 33060/tcp   mysql_desafio_container
+```
 
 ## Abra a aplicação no navegador fazendo uso do seguinte link:
 http://localhost:5284/swagger/index.html
