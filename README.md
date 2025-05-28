@@ -42,6 +42,15 @@ http://localhost:5284/swagger/index.html
 
 # 🚀 Executando com o Visual Studio
 
+## 💡 Requisitos necessários no Visual Studio
+Para rodar o projeto dentro do Visual Studio, você precisa ter:
+
+SDK do .NET 8 instalado em sua máquina.
+
+Banco de dados MySQL disponível, seja localmente instalado ou rodando em um contêiner Docker.
+
+Isso garante que a aplicação tenha todas as dependências para funcionar corretamente.
+
 ## Clone o repositório
 git clone "https://github.com/talithaSouza/obj_gestao_bancaria.git"
 
@@ -73,6 +82,15 @@ Você pode acessar essa URL para abrir a interface do Swagger e testar os endpoi
 ----------------------
 
 # Executando com VS Code
+
+## 💡 Requisitos necessários no VS Code
+Para rodar o projeto dentro do VS Code, você precisa ter:
+
+SDK do .NET 8 instalado em sua máquina.
+
+Banco de dados MySQL disponível, seja localmente instalado ou rodando em um contêiner Docker.
+
+Isso garante que a aplicação tenha todas as dependências para funcionar corretamente.
 
 ## Clone o repositório
 git clone "https://github.com/talithaSouza/obj_gestao_bancaria.git"
