@@ -29,7 +29,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddControllers()
        .AddJsonOptions(opts =>
        {
-           opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; 
+           opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
            opts.JsonSerializerOptions.WriteIndented = true;
        });
 
@@ -42,12 +42,10 @@ builder.Services.RegisterAutoMapper();
 var app = builder.Build();
 
 #region configure
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
